@@ -22,6 +22,10 @@
 
 **Torr2Jelly** is a modern, lightweight bridge connecting **Prowlarr**, **TorrServer**, and **Jellyfin**. It allows users to search trackers, add torrents with one click, automatically generate `.strm` links, organize media hierarchies, and start streaming high-bitrate movies and shows directly on Jellyfin within seconds.
 
+<p align="center">
+  <img src="static/screenshot.png" alt="Torr2Jelly Web Interface" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+</p>
+
 ```mermaid
 flowchart LR
     User([👤 User / Browser]) <--> WebUI[💻 Torr2Jelly Web UI]
