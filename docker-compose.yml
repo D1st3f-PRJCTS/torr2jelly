@@ -1,0 +1,30 @@
+services:
+  torr2jelly:
+    build: .
+    container_name: torr2jelly
+    restart: unless-stopped
+    ports:
+      - "${PORT_BINDING:-8095}:8095"
+    environment:
+      - TORRSERVER_URL=${TORRSERVER_URL:-http://torrserver:8090}
+      - JELLYFIN_STREAM_TORR_URL=${JELLYFIN_STREAM_TORR_URL:-http://torrserver:8090}
+      - JELLYFIN_URL=${JELLYFIN_URL:-http://jellyfin:8096}
+      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY:-}
+      - PROWLARR_URL=${PROWLARR_URL:-http://prowlarr:9696}
+      - PROWLARR_API_KEY=${PROWLARR_API_KEY:-}
+      - MEDIA_DIR=${MEDIA_DIR:-/media}
+      - AUTO_SYNC=${AUTO_SYNC:-true}
+      - SYNC_INTERVAL=${SYNC_INTERVAL:-30}
+      - LANGUAGE=${LANGUAGE:-en}
+      - JWT_SECRET=${JWT_SECRET:-}
+      - INITIAL_ADMIN_USERNAME=${INITIAL_ADMIN_USERNAME:-}
+      - INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:-}
+    volumes:
+      - ${MEDIA_DIR_PATH:-./media}:/media
+      - ${CONFIG_DIR_PATH:-./config}:/app/config
+    networks:
+      - media-net
+
+networks:
+  media-net:
+    name: media-net
