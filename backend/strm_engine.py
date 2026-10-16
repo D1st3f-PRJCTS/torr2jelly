@@ -2,48 +2,62 @@ import json
 import os
 import re
 import shutil
-from typing import List, Dict, Any, Tuple, Optional, Set
+from typing import Any
 
 VIDEO_EXTS = {".mkv", ".mp4", ".avi", ".ts", ".mov", ".m4v", ".webm"}
 
+
 def sanitize_filename(name: str) -> str:
-    name = re.sub(r'[\x5c\x2f\x2a\x3f\x3a\x22\x3c\x3e\x7c]', '', name)
-    name = re.sub(r'\s+', ' ', name)
+    name = re.sub(r"[\x5c\x2f\x2a\x3f\x3a\x22\x3c\x3e\x7c]", "", name)
+    name = re.sub(r"\s+", " ", name)
     return name.strip()
+
 
 def clean_media_title(title: str) -> str:
     if not title:
         return "Untitled"
-    cleaned = re.sub(r'\[.*?\]', ' ', title)
+    cleaned = re.sub(r"\[.*?\]", " ", title)
     # Remove years like (2019) or ranges (2019-2022)
-    cleaned = re.sub(r'\(\s*\d{4}(?:[-\u2013]\d{4})?\s*\)', ' ', cleaned)
-    # Remove season tags: Season 1-2, Сезон 1, S1, S01-S05 (requiring word boundary so Peaky Blinders does not match S1080)
-    cleaned = re.sub(r'\(?\s*(?:\b(?:Season|Сезон)\s*\d+(?:[.\-\u2013]\d+)?|\bS\d{1,2}(?:[.\-\u2013]S?\d{1,2})?)\s*\)?', ' ', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\(\s*\d{4}(?:[-\u2013]\d{4})?\s*\)", " ", cleaned)
+    # Remove season tags: Season 1-2, Сезон 1, S1, S01-S05
+    # (requiring word boundary so Peaky Blinders does not match S1080)
+    cleaned = re.sub(
+        r"\(?\s*(?:\b(?:Season|Сезон)\s*\d+(?:[.\-\u2013]\d+)?|\bS\d{1,2}(?:[.\-\u2013]S?\d{1,2})?)\s*\)?",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
     # Remove episode tags: E01-E10, Серії 1-10 з 10, etc.
-    cleaned = re.sub(r'\(?\s*(?:\b(?:Episode|Сері[яї]|Серій|Епизод)\s*\d+(?:[.\-\u2013]\d+)?|\bE\d{1,3}(?:[.\-\u2013]E?\d{1,3})?)\s*\)?', ' ', cleaned, flags=re.IGNORECASE)
-    
+    cleaned = re.sub(
+        r"\(?\s*(?:\b(?:Episode|Сері[яї]|Серій|Епизод)\s*\d+(?:[.\-\u2013]\d+)?|\bE\d{1,3}(?:[.\-\u2013]E?\d{1,3})?)\s*\)?",
+        " ",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+
     # Comprehensive release, audio, codec and language tags
     tags = [
-        r'\b(?:BD|UHD)?Remux\b',
-        r'\b\d+x(?:Ukr|Eng|Rus|Pol|Fra|Ger|Jap|Multi)\b',
-        r'\b(?:Sub\s*(?:Ukr|Eng|Rus)?)\b',
-        r'\b(?:BDRip|WEBRip|WEB-DL|DVDRip|HDRip|BluRay|Blu-ray|BD|1080p|720p|2160p|4K|UHD|HDTV|HD|SD)\b',
-        r'\b(?:HDR10\+?|Dolby\s*Vision|DV|SDR|10bit|8bit|IMAX|AV1|HEVC|H\.?265|x265|H\.?264|x264|XviD|DivX)\b',
-        r'\b(?:DTS-HD(?:\s*MA)?|TrueHD|Atmos|E-?AC-?3|DDP\d?\.?\d?|AC3|AAC|FLAC|Dual|DVO|MVO|VO|Dub|Line)\b',
-        r'\b(?:PROPER|REPACK|EXTENDED|UNRATED|THEATRICAL|DIRECTOR\x27?S?\s*CUT|RESTORED|CRITERION|HYBRID)\b',
-        r'\b(?:UkrEng|Ukr|Eng|Toloka|Hurtom|NF)\b'
+        r"\b(?:BD|UHD)?Remux\b",
+        r"\b\d+x(?:Ukr|Eng|Rus|Pol|Fra|Ger|Jap|Multi)\b",
+        r"\b(?:Sub\s*(?:Ukr|Eng|Rus)?)\b",
+        r"\b(?:BDRip|WEBRip|WEB-DL|DVDRip|HDRip|BluRay|Blu-ray|BD|1080p|720p|2160p|4K|UHD|HDTV|HD|SD)\b",
+        r"\b(?:HDR10\+?|Dolby\s*Vision|DV|SDR|10bit|8bit|IMAX|AV1|HEVC|H\.?265|x265|H\.?264|x264|XviD|DivX)\b",
+        r"\b(?:DTS-HD(?:\s*MA)?|TrueHD|Atmos|E-?AC-?3|DDP\d?\.?\d?|AC3|AAC|FLAC|Dual|DVO|MVO|VO|Dub|Line)\b",
+        r"\b(?:PROPER|REPACK|EXTENDED|UNRATED|THEATRICAL|DIRECTOR\x27?S?\s*CUT|RESTORED|CRITERION|HYBRID)\b",
+        r"\b(?:UkrEng|Ukr|Eng|Toloka|Hurtom|NF)\b",
     ]
     for tag in tags:
-        cleaned = re.sub(tag, ' ', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(tag, " ", cleaned, flags=re.IGNORECASE)
 
     # Remove standalone 4-digit years like 2024 if preceded by title words
-    cleaned = re.sub(r'(?<=[a-zA-Z0-9])[._ ]+(?:19\d{2}|20\d{2})(?=[._ ]|$)', ' ', cleaned)
-    cleaned = cleaned.replace('.', ' ').replace('_', ' ')
+    cleaned = re.sub(r"(?<=[a-zA-Z0-9])[._ ]+(?:19\d{2}|20\d{2})(?=[._ ]|$)", " ", cleaned)
+    cleaned = cleaned.replace(".", " ").replace("_", " ")
     cleaned = sanitize_filename(cleaned)
-    cleaned = re.sub(r'[\(\)\-\u2013|/]+$', '', cleaned).strip()
+    cleaned = re.sub(r"[\(\)\-\u2013|/]+$", "", cleaned).strip()
     return cleaned if cleaned else sanitize_filename(title)
 
-def extract_video_files(torrent_item: Dict[str, Any]) -> List[Dict[str, Any]]:
+
+def extract_video_files(torrent_item: dict[str, Any]) -> list[dict[str, Any]]:
     file_stats = torrent_item.get("file_stats") or []
     if not file_stats and torrent_item.get("data"):
         try:
@@ -60,23 +74,24 @@ def extract_video_files(torrent_item: Dict[str, Any]) -> List[Dict[str, Any]]:
             video_files.append(f)
     return video_files
 
-def parse_episode_info(filename: str, parts: List[str], default_title: str) -> Tuple[str, str, str]:
+
+def parse_episode_info(filename: str, parts: list[str], default_title: str) -> tuple[str, str, str]:
     show_name = clean_media_title(default_title)
     base_name = os.path.splitext(filename)[0]
 
     # 1. Specials check
     is_special = False
     for p in parts:
-        if re.search(r'\b(special|спеш[еа]л|s1\.5|sp)\b', p, re.IGNORECASE):
+        if re.search(r"\b(special|спеш[еа]л|s1\.5|sp)\b", p, re.IGNORECASE):
             is_special = True
             break
-    if not is_special and re.search(r'\b(special|спеш[еа]л|s00e\d+)\b', filename, re.IGNORECASE):
+    if not is_special and re.search(r"\b(special|спеш[еа]л|s00e\d+)\b", filename, re.IGNORECASE):
         is_special = True
 
     if is_special:
-        em = re.search(r'[Ee](\d{1,2})', filename)
+        em = re.search(r"[Ee](\d{1,2})", filename)
         ep_num = int(em.group(1)) if em else 1
-        prefix_match = re.search(r'^(.*?)[._ -]+(?:Special|S00|SP)', filename, re.IGNORECASE)
+        prefix_match = re.search(r"^(.*?)[._ -]+(?:Special|S00|SP)", filename, re.IGNORECASE)
         if prefix_match:
             cand = clean_media_title(prefix_match.group(1))
             if cand:
@@ -85,14 +100,14 @@ def parse_episode_info(filename: str, parts: List[str], default_title: str) -> T
         return show_name, "Season 00", out_name
 
     # 2. Match standard S01E02 or 1x02 directly in filename
-    m = re.search(r'[Ss](\d{1,2})[Ee](\d{1,2})', filename)
+    m = re.search(r"[Ss](\d{1,2})[Ee](\d{1,2})", filename)
     if not m:
-        m = re.search(r'\b(\d{1,2})x(\d{1,2})\b', filename)
+        m = re.search(r"\b(\d{1,2})x(\d{1,2})\b", filename)
 
     if m:
         season_num = int(m.group(1))
         season_folder = f"Season {season_num:02d}"
-        prefix = filename[:m.start()].strip(' ._-[]()')
+        prefix = filename[: m.start()].strip(" ._-[]()")
         if prefix:
             cand = clean_media_title(prefix)
             if cand:
@@ -101,29 +116,31 @@ def parse_episode_info(filename: str, parts: List[str], default_title: str) -> T
 
     # 3. Check parent folders
     for part in reversed(parts[:-1]):
-        sm = re.search(r'\b(?:season|сезон)\s*(\d{1,2})\b', part, re.IGNORECASE)
+        sm = re.search(r"\b(?:season|сезон)\s*(\d{1,2})\b", part, re.IGNORECASE)
         if sm:
             season_num = int(sm.group(1))
             return show_name, f"Season {season_num:02d}", sanitize_filename(base_name)
 
     return show_name, "Season 01", sanitize_filename(base_name)
 
+
 def get_category_path(category_def: Any, media_dir: str) -> str:
     """
     Resolves the storage directory for a category.
     Supports relative paths (under media_dir) and absolute paths.
     """
-    if hasattr(category_def, 'model_dump'):
+    if hasattr(category_def, "model_dump"):
         category_def = category_def.model_dump()
-    path = category_def.get('path') if isinstance(category_def, dict) else getattr(category_def, 'path', '')
+    path = category_def.get("path") if isinstance(category_def, dict) else getattr(category_def, "path", "")
     if not path:
-        cat_id = category_def.get('id', '') if isinstance(category_def, dict) else getattr(category_def, 'id', '')
-        path = cat_id or 'movies'
+        cat_id = category_def.get("id", "") if isinstance(category_def, dict) else getattr(category_def, "id", "")
+        path = cat_id or "movies"
     if os.path.isabs(path):
         return os.path.normpath(path)
     return os.path.normpath(os.path.join(media_dir, path))
 
-def get_all_category_dirs(media_dir: str, categories: Optional[List[Any]] = None) -> List[str]:
+
+def get_all_category_dirs(media_dir: str, categories: list[Any] | None = None) -> list[str]:
     """
     Returns list of all active and legacy category root directories.
     """
@@ -132,9 +149,10 @@ def get_all_category_dirs(media_dir: str, categories: Optional[List[Any]] = None
         for c in categories:
             dirs.add(get_category_path(c, media_dir))
     # Always include standard legacy dirs
-    dirs.add(os.path.normpath(os.path.join(media_dir, 'shows')))
-    dirs.add(os.path.normpath(os.path.join(media_dir, 'movies')))
+    dirs.add(os.path.normpath(os.path.join(media_dir, "shows")))
+    dirs.add(os.path.normpath(os.path.join(media_dir, "movies")))
     return sorted(list(dirs))
+
 
 def migrate_category_folder(old_abs: str, new_abs: str) -> None:
     """
@@ -167,11 +185,8 @@ def migrate_category_folder(old_abs: str, new_abs: str) -> None:
     except Exception:
         pass
 
-def recover_title_from_disk(
-    t_hash: str,
-    media_dir: str,
-    categories: Optional[List[Any]] = None
-) -> Optional[Tuple[str, str]]:
+
+def recover_title_from_disk(t_hash: str, media_dir: str, categories: list[Any] | None = None) -> tuple[str, str] | None:
     """
     Recovers the torrent/media title by inspecting existing .strm files on disk that point to this hash.
     Returns (discovered_title, folder_name) or None.
@@ -194,24 +209,25 @@ def recover_title_from_disk(
                             with open(os.path.join(root, f), "r", encoding="utf-8") as fl:
                                 if pattern in fl.read():
                                     folder_name = show_or_movie
-                                    if folder_name and not re.match(r'^[0-9a-fA-F]{40}$', folder_name):
+                                    if folder_name and not re.match(r"^[0-9a-fA-F]{40}$", folder_name):
                                         return folder_name, folder_name
                                     base_file = os.path.splitext(f)[0]
                                     clean_f = clean_media_title(base_file)
-                                    if clean_f and not re.match(r'^[0-9a-fA-F]{40}$', clean_f):
+                                    if clean_f and not re.match(r"^[0-9a-fA-F]{40}$", clean_f):
                                         return clean_f, clean_f
                         except Exception:
                             pass
     return None
 
+
 def sync_single_torrent(
-    torrent_item: Dict[str, Any],
+    torrent_item: dict[str, Any],
     media_dir: str,
     stream_base_url: str,
-    override_category: Optional[str] = None,
-    override_title: Optional[str] = None,
-    categories: Optional[List[Any]] = None
-) -> List[str]:
+    override_category: str | None = None,
+    override_title: str | None = None,
+    categories: list[Any] | None = None,
+) -> list[str]:
     t_hash = torrent_item.get("hash")
     if not t_hash:
         return []
@@ -232,14 +248,28 @@ def sync_single_torrent(
     if not cat_id or cat_id == "auto":
         target_type = "movie" if is_single_file else "show"
         if categories:
-            matched_cat = next((c for c in categories if (c.get("type") if isinstance(c, dict) else getattr(c, "type", "")) == target_type), None)
-            cat_id = (matched_cat.get("id") if isinstance(matched_cat, dict) else getattr(matched_cat, "id", None)) if matched_cat else target_type
+            matched_cat = next(
+                (
+                    c
+                    for c in categories
+                    if (c.get("type") if isinstance(c, dict) else getattr(c, "type", "")) == target_type
+                ),
+                None,
+            )
+            cat_id = (
+                (matched_cat.get("id") if isinstance(matched_cat, dict) else getattr(matched_cat, "id", None))
+                if matched_cat
+                else target_type
+            )
         else:
             cat_id = target_type
 
     cat_def = None
     if categories:
-        cat_def = next((c for c in categories if (c.get("id") if isinstance(c, dict) else getattr(c, "id", "")) == cat_id), None)
+        cat_def = next(
+            (c for c in categories if (c.get("id") if isinstance(c, dict) else getattr(c, "id", "")) == cat_id),
+            None,
+        )
 
     if cat_def:
         cat_type = cat_def.get("type", "movie") if isinstance(cat_def, dict) else getattr(cat_def, "type", "movie")
@@ -249,7 +279,7 @@ def sync_single_torrent(
         dest_base_dir = os.path.join(media_dir, "movies" if cat_type == "movie" else "shows")
 
     os.makedirs(dest_base_dir, exist_ok=True)
-    synced_paths: List[str] = []
+    synced_paths: list[str] = []
 
     if cat_type == "movie":
         clean_title = clean_media_title(raw_title)
@@ -322,17 +352,18 @@ def sync_single_torrent(
 
     return synced_paths
 
+
 def sync_all_torrents(
-    torrents: List[Dict[str, Any]],
+    torrents: list[dict[str, Any]],
     media_dir: str,
     stream_base_url: str,
-    title_overrides: Optional[Dict[str, str]] = None,
-    category_overrides: Optional[Dict[str, str]] = None,
-    categories: Optional[List[Any]] = None
-) -> Dict[str, Any]:
+    title_overrides: dict[str, str] | None = None,
+    category_overrides: dict[str, str] | None = None,
+    categories: list[Any] | None = None,
+) -> dict[str, Any]:
     total_files = 0
     synced_items = 0
-    all_synced_paths: Set[str] = set()
+    all_synced_paths: set[str] = set()
 
     for item in torrents:
         t_hash = item.get("hash")
@@ -344,7 +375,7 @@ def sync_all_torrents(
             stream_base_url=stream_base_url,
             override_category=override_cat,
             override_title=override_title,
-            categories=categories
+            categories=categories,
         )
         if paths:
             synced_items += 1
@@ -354,14 +385,15 @@ def sync_all_torrents(
     return {
         "torrents_count": len(torrents),
         "synced_torrents": synced_items,
-        "total_strm_files": total_files
+        "total_strm_files": total_files,
     }
+
 
 def cleanup_orphaned_strm_files(
     t_hash: str,
-    valid_paths: Set[str],
+    valid_paths: set[str],
     media_dir: str,
-    categories: Optional[List[Any]] = None
+    categories: list[Any] | None = None,
 ) -> int:
     """
     Finds and deletes any .strm files referencing t_hash that are not in valid_paths.
@@ -401,19 +433,18 @@ def cleanup_orphaned_strm_files(
 
     return removed_count
 
-def remove_torrent_files(
-    torrent_item: Dict[str, Any],
-    media_dir: str,
-    categories: Optional[List[Any]] = None
-) -> int:
+
+def remove_torrent_files(torrent_item: dict[str, Any], media_dir: str, categories: list[Any] | None = None) -> int:
     t_hash = torrent_item.get("hash")
     if not t_hash:
         return 0
     return cleanup_orphaned_strm_files(t_hash, set(), media_dir, categories)
 
+
 # ==================== ONLINE POSTER DISCOVERY ====================
 
-def extract_poster_search_candidates(raw_title: str) -> List[str]:
+
+def extract_poster_search_candidates(raw_title: str) -> list[str]:
     """
     Produces an ordered list of search candidate strings for Cinemeta.
     E.g. for "Молодий Папа / The Young Pope (2016)", candidates are:
@@ -445,11 +476,13 @@ def extract_poster_search_candidates(raw_title: str) -> List[str]:
             result.append(c_clean)
     return result
 
-def extract_year(raw_title: str) -> Optional[str]:
+
+def extract_year(raw_title: str) -> str | None:
     m = re.search(r"\b(19\d{2}|20\d{2})\b", raw_title)
     return m.group(1) if m else None
 
-def score_meta(meta: Dict[str, Any], candidate: str, target_year: Optional[str]) -> int:
+
+def score_meta(meta: dict[str, Any], candidate: str, target_year: str | None) -> int:
     name = (meta.get("name") or "").strip().lower()
     cand = candidate.strip().lower()
     if not name or not cand:
@@ -478,14 +511,18 @@ def score_meta(meta: Dict[str, Any], candidate: str, target_year: Optional[str])
 
     return score
 
-async def fetch_poster_online(title: str, category: Optional[str] = "show") -> Optional[str]:
+
+async def fetch_poster_online(title: str, category: str | None = "show") -> str | None:
     import httpx
+
     candidates = extract_poster_search_candidates(title)
     if not candidates:
         return None
 
     year = extract_year(title)
-    is_series = (category in ("show", "series")) or bool(re.search(r"\b(?:season|сезон|s\d+|сері[яї])\b", title, re.IGNORECASE))
+    is_series = (category in ("show", "series")) or bool(
+        re.search(r"\b(?:season|сезон|s\d+|сері[яї])\b", title, re.IGNORECASE)
+    )
     cat_types = ["series", "movie"] if is_series else ["movie", "series"]
 
     best_match = None
@@ -516,13 +553,13 @@ async def fetch_poster_online(title: str, category: Optional[str] = "show") -> O
         return best_match.get("poster")
     return None
 
+
 # ==================== FILE STRUCTURE MANAGEMENT ====================
 
+
 def find_torrent_root_folder(
-    torrent_item: Dict[str, Any],
-    media_dir: str,
-    categories: Optional[List[Any]] = None
-) -> Tuple[str, str]:
+    torrent_item: dict[str, Any], media_dir: str, categories: list[Any] | None = None
+) -> tuple[str, str]:
     """
     Finds the root media directory for this torrent.
     Returns (abs_path, rel_path), e.g. ('/media/shows/Euphoria', 'shows/Euphoria')
@@ -557,10 +594,20 @@ def find_torrent_root_folder(
     cat_id = torrent_item.get("category")
     cat_def = None
     if categories and cat_id:
-        cat_def = next((c for c in categories if (c.get("id") if isinstance(c, dict) else getattr(c, "id", "")) == cat_id), None)
+        cat_def = next(
+            (c for c in categories if (c.get("id") if isinstance(c, dict) else getattr(c, "id", "")) == cat_id),
+            None,
+        )
     if not cat_def and categories:
         target_type = "movie" if is_movie else "show"
-        cat_def = next((c for c in categories if (c.get("type") if isinstance(c, dict) else getattr(c, "type", "")) == target_type), None)
+        cat_def = next(
+            (
+                c
+                for c in categories
+                if (c.get("type") if isinstance(c, dict) else getattr(c, "type", "")) == target_type
+            ),
+            None,
+        )
 
     if cat_def:
         target_base = get_category_path(cat_def, media_dir)
@@ -571,20 +618,16 @@ def find_torrent_root_folder(
     rel = os.path.relpath(target, media_dir)
     return target, rel
 
-def get_media_structure(abs_root: str, rel_root: str) -> Dict[str, Any]:
+
+def get_media_structure(abs_root: str, rel_root: str) -> dict[str, Any]:
     """
     Returns directory tree and list of all media files for this show/movie.
     """
     if not os.path.exists(abs_root):
-        return {
-            "root_path": rel_root,
-            "exists": False,
-            "folders": [""],
-            "files": []
-        }
+        return {"root_path": rel_root, "exists": False, "folders": [""], "files": []}
 
-    folders: List[str] = [""]
-    files_list: List[Dict[str, Any]] = []
+    folders: list[str] = [""]
+    files_list: list[dict[str, Any]] = []
 
     for root, dirs, files in os.walk(abs_root):
         rel_dir = os.path.relpath(root, abs_root)
@@ -596,22 +639,25 @@ def get_media_structure(abs_root: str, rel_root: str) -> Dict[str, Any]:
         for f in sorted(files):
             file_abs = os.path.join(root, f)
             rel_path = os.path.join(rel_dir, f) if rel_dir else f
-            files_list.append({
-                "name": f,
-                "folder": rel_dir,
-                "rel_dir": rel_dir,
-                "path": rel_path,
-                "rel_path": rel_path,
-                "size": os.path.getsize(file_abs) if os.path.exists(file_abs) else 0
-            })
+            files_list.append(
+                {
+                    "name": f,
+                    "folder": rel_dir,
+                    "rel_dir": rel_dir,
+                    "path": rel_path,
+                    "rel_path": rel_path,
+                    "size": os.path.getsize(file_abs) if os.path.exists(file_abs) else 0,
+                }
+            )
 
     folders = sorted(list(set(folders)))
     return {
         "root_path": rel_root,
         "exists": True,
         "folders": folders,
-        "files": files_list
+        "files": files_list,
     }
+
 
 def _check_safe_path(base_dir: str, rel_path: str) -> str:
     target_abs = os.path.abspath(os.path.join(base_dir, rel_path))
@@ -619,6 +665,7 @@ def _check_safe_path(base_dir: str, rel_path: str) -> str:
     if not (target_abs == base_abs or target_abs.startswith(base_abs + os.sep)):
         raise ValueError("Invalid path: traversal outside allowed directory")
     return target_abs
+
 
 def create_media_folder(abs_root: str, folder_name: str) -> str:
     _check_safe_path(abs_root, folder_name)
@@ -629,6 +676,7 @@ def create_media_folder(abs_root: str, folder_name: str) -> str:
     target_dir = _check_safe_path(abs_root, rel_path)
     os.makedirs(target_dir, exist_ok=True)
     return os.path.relpath(target_dir, abs_root)
+
 
 def rename_media_item(abs_root: str, old_rel_path: str, new_name_or_rel: str) -> str:
     old_abs = _check_safe_path(abs_root, old_rel_path)
@@ -648,7 +696,8 @@ def rename_media_item(abs_root: str, old_rel_path: str, new_name_or_rel: str) ->
     os.rename(old_abs, new_abs)
     return os.path.relpath(new_abs, abs_root)
 
-def move_media_files(abs_root: str, file_rel_paths: List[str], target_folder_rel: str) -> int:
+
+def move_media_files(abs_root: str, file_rel_paths: list[str], target_folder_rel: str) -> int:
     target_dir = _check_safe_path(abs_root, target_folder_rel.strip("/"))
     os.makedirs(target_dir, exist_ok=True)
 
@@ -661,6 +710,7 @@ def move_media_files(abs_root: str, file_rel_paths: List[str], target_folder_rel
                 shutil.move(src, dst)
                 moved += 1
     return moved
+
 
 def delete_media_item(abs_root: str, rel_path: str) -> bool:
     target_abs = _check_safe_path(abs_root, rel_path)
@@ -679,7 +729,8 @@ def delete_media_item(abs_root: str, rel_path: str) -> bool:
         os.remove(target_abs)
     return True
 
-def rename_torrent_root_folder(abs_root: str, new_title: str) -> Optional[str]:
+
+def rename_torrent_root_folder(abs_root: str, new_title: str) -> str | None:
     """
     Renames the show or movie root folder on disk when torrent title is renamed.
     e.g. /media/shows/OldName -> /media/shows/NewName
@@ -705,7 +756,8 @@ def rename_torrent_root_folder(abs_root: str, new_title: str) -> Optional[str]:
         shutil.move(abs_root, new_abs)
     return new_abs
 
-def auto_organize_seasons(abs_root: str) -> Dict[str, Any]:
+
+def auto_organize_seasons(abs_root: str) -> dict[str, Any]:
     """
     Intelligently detects season numbers from episode filenames (loose or scattered),
     creates standard Season XX folders, moves the files into them,
@@ -714,32 +766,32 @@ def auto_organize_seasons(abs_root: str) -> Dict[str, Any]:
     if not os.path.exists(abs_root):
         return {"status": "error", "message": "Media folder does not exist"}
 
-    all_strm_files: List[Tuple[str, str]] = []
+    all_strm_files: list[tuple[str, str]] = []
     for root, dirs, files in os.walk(abs_root):
         for f in files:
             if f.endswith(".strm"):
                 all_strm_files.append((os.path.join(root, f), f))
 
     moved_count = 0
-    created_folders: Set[str] = set()
+    created_folders: set[str] = set()
 
     for full_path, filename in all_strm_files:
         # Detect season
         season_num = None
         # Pattern S01E02 or 1x02
-        m = re.search(r'[Ss](\d{1,2})[Ee](\d{1,2})', filename)
+        m = re.search(r"[Ss](\d{1,2})[Ee](\d{1,2})", filename)
         if not m:
-            m = re.search(r'\b(\d{1,2})x(\d{1,2})\b', filename)
+            m = re.search(r"\b(\d{1,2})x(\d{1,2})\b", filename)
         if m:
             season_num = int(m.group(1))
         else:
             # Pattern Season 1, Сезон 1
-            sm = re.search(r'\b(?:season|сезон)\s*(\d{1,2})\b', filename, re.IGNORECASE)
+            sm = re.search(r"\b(?:season|сезон)\s*(\d{1,2})\b", filename, re.IGNORECASE)
             if sm:
                 season_num = int(sm.group(1))
 
         # Check specials
-        is_special = bool(re.search(r'\b(special|спеш[еа]л|s00)\b', filename, re.IGNORECASE))
+        is_special = bool(re.search(r"\b(special|спеш[еа]л|s00)\b", filename, re.IGNORECASE))
         if is_special:
             target_folder = "Season 00"
         elif season_num is not None:
@@ -770,5 +822,5 @@ def auto_organize_seasons(abs_root: str) -> Dict[str, Any]:
     return {
         "status": "ok",
         "moved_count": moved_count,
-        "folders": sorted(list(created_folders))
+        "folders": sorted(list(created_folders)),
     }

@@ -1,0 +1,14 @@
+[project]
+name = "torr2jelly"
+version = "1.0.0"
+description = "Lightweight Torrent-to-Jellyfin streaming bridge powered by TorrServer"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E402"]

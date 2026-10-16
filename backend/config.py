@@ -1,22 +1,25 @@
 import json
 import os
 import secrets
-from typing import Optional, List, Dict, Any
+
 from pydantic import BaseModel, Field
 
 CONFIG_FILE_PATH = os.getenv("CONFIG_FILE_PATH", "/app/config/settings.json")
+
 
 class MediaCategory(BaseModel):
     id: str
     name: str
     type: str = "movie"  # "movie" or "show"
-    path: str = ""       # e.g. "movies", "shows", or absolute "/media/cartoons"
+    path: str = ""  # e.g. "movies", "shows", or absolute "/media/cartoons"
 
-def get_default_categories() -> List[MediaCategory]:
+
+def get_default_categories() -> list[MediaCategory]:
     return [
         MediaCategory(id="movie", name="Movies", type="movie", path="movies"),
         MediaCategory(id="show", name="Shows", type="show", path="shows"),
     ]
+
 
 class Settings(BaseModel):
     torrserver_url: str = os.getenv("TORRSERVER_URL", "http://torrserver:8090")
@@ -26,12 +29,17 @@ class Settings(BaseModel):
     prowlarr_url: str = os.getenv("PROWLARR_URL", "http://prowlarr:9696")
     prowlarr_api_key: str = os.getenv("PROWLARR_API_KEY", "")
     media_dir: str = os.getenv("MEDIA_DIR", "/media")
-    categories: List[MediaCategory] = Field(default_factory=get_default_categories)
+    categories: list[MediaCategory] = Field(default_factory=get_default_categories)
     auto_sync: bool = os.getenv("AUTO_SYNC", "true").lower() in ("true", "1", "yes")
     sync_interval: int = int(os.getenv("SYNC_INTERVAL", "30"))
     jwt_secret: str = os.getenv("JWT_SECRET", "")
     language: str = os.getenv("LANGUAGE", "en")
-    only_gold_torrents: bool = os.getenv("ONLY_GOLD_TORRENTS", "false").lower() in ("true", "1", "yes")
+    only_gold_torrents: bool = os.getenv("ONLY_GOLD_TORRENTS", "false").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
+
 
 def load_settings() -> Settings:
     settings = Settings()
@@ -56,6 +64,7 @@ def load_settings() -> Settings:
             print(f"Warning: Could not persist generated jwt_secret: {e}")
 
     return settings
+
 
 def save_settings(new_settings: Settings) -> None:
     os.makedirs(os.path.dirname(CONFIG_FILE_PATH), exist_ok=True)

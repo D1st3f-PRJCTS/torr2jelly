@@ -5,6 +5,7 @@ try:
 except ImportError:
     from torr2jelly.backend.prowlarr_client import determine_release_status
 
+
 class TestProwlarrReleaseStatus(unittest.TestCase):
     def test_determine_release_status_gold(self):
         self.assertEqual(determine_release_status(["freeleech"], None), "gold")
@@ -36,6 +37,7 @@ class TestProwlarrReleaseStatus(unittest.TestCase):
         filtered = [r for r in items if r.get("release_status") == "gold"]
         self.assertEqual(len(filtered), 1)
         self.assertEqual(filtered[0]["title"], "Movie A")
+
 
 if __name__ == "__main__":
     unittest.main()

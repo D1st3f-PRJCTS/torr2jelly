@@ -1,8 +1,7 @@
-import unittest
-import tempfile
 import os
-import shutil
 import sys
+import tempfile
+import unittest
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _torr2jelly_dir = os.path.dirname(_current_dir)
@@ -10,11 +9,11 @@ for p in (_torr2jelly_dir,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from backend.config import MediaCategory, Settings, get_default_categories
 from backend import strm_engine
+from backend.config import MediaCategory, get_default_categories
+
 
 class TestCategories(unittest.TestCase):
-
     def setUp(self):
         self.tmp_media = tempfile.TemporaryDirectory()
         self.media_dir = self.tmp_media.name
@@ -53,19 +52,19 @@ class TestCategories(unittest.TestCase):
     def test_sync_to_custom_category(self):
         cats = [
             {"id": "cartoons", "name": "Cartoons", "type": "movie", "path": "animated"},
-            {"id": "anime", "name": "Anime", "type": "show", "path": "anime_shows"}
+            {"id": "anime", "name": "Anime", "type": "show", "path": "anime_shows"},
         ]
         torrent_movie = {
             "hash": "hash_cartoons_1",
             "title": "Shrek.2001.1080p",
-            "file_stats": [{"id": 0, "path": "Shrek.2001.mkv", "size": 1000}]
+            "file_stats": [{"id": 0, "path": "Shrek.2001.mkv", "size": 1000}],
         }
         paths = strm_engine.sync_single_torrent(
             torrent_item=torrent_movie,
             media_dir=self.media_dir,
             stream_base_url="http://torrserver:8090",
             override_category="cartoons",
-            categories=cats
+            categories=cats,
         )
         self.assertEqual(len(paths), 1)
         expected_path = os.path.join(self.media_dir, "animated", "Shrek", "Shrek.strm")
@@ -73,26 +72,30 @@ class TestCategories(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_path))
 
     def test_sync_show_to_custom_category(self):
-        cats = [
-            {"id": "anime", "name": "Anime", "type": "show", "path": "anime_series"}
-        ]
+        cats = [{"id": "anime", "name": "Anime", "type": "show", "path": "anime_series"}]
         torrent_show = {
             "hash": "hash_anime_1",
             "title": "Attack on Titan (Season 1)",
             "file_stats": [
                 {"id": 0, "path": "Attack.on.Titan.S01E01.mkv", "size": 1000},
-                {"id": 1, "path": "Attack.on.Titan.S01E02.mkv", "size": 1000}
-            ]
+                {"id": 1, "path": "Attack.on.Titan.S01E02.mkv", "size": 1000},
+            ],
         }
         paths = strm_engine.sync_single_torrent(
             torrent_item=torrent_show,
             media_dir=self.media_dir,
             stream_base_url="http://torrserver:8090",
             override_category="anime",
-            categories=cats
+            categories=cats,
         )
         self.assertEqual(len(paths), 2)
-        ep1 = os.path.join(self.media_dir, "anime_series", "Attack on Titan", "Season 01", "Attack.on.Titan.S01E01.strm")
+        ep1 = os.path.join(
+            self.media_dir,
+            "anime_series",
+            "Attack on Titan",
+            "Season 01",
+            "Attack.on.Titan.S01E01.strm",
+        )
         self.assertTrue(os.path.exists(ep1))
 
     def test_extract_poster_candidates(self):
@@ -106,6 +109,7 @@ class TestCategories(unittest.TestCase):
         # Peaky Blinders should not lose the "s" in Blinders
         clean = strm_engine.clean_media_title("Peaky Blinders 1080p H265 [Ukr,Eng] [Toloka]")
         self.assertEqual(clean, "Peaky Blinders")
+
 
 if __name__ == "__main__":
     unittest.main()

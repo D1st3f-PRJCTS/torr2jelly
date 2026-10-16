@@ -1,11 +1,14 @@
-import httpx
-from typing import Dict, Any, Optional
+from typing import Any
 
-def _get_headers(api_key: str) -> Dict[str, str]:
+import httpx
+
+
+def _get_headers(api_key: str) -> dict[str, str]:
     return {
         "Authorization": f'MediaBrowser Token="{api_key}"',
-        "Accept": "application/json"
+        "Accept": "application/json",
     }
+
 
 async def check_health(jellyfin_url: str, api_key: str) -> bool:
     try:
@@ -16,7 +19,8 @@ async def check_health(jellyfin_url: str, api_key: str) -> bool:
     except Exception:
         return False
 
-async def get_system_info(jellyfin_url: str, api_key: str) -> Optional[Dict[str, Any]]:
+
+async def get_system_info(jellyfin_url: str, api_key: str) -> dict[str, Any] | None:
     try:
         url = f"{jellyfin_url.rstrip('/')}/System/Info"
         async with httpx.AsyncClient(timeout=8.0) as client:
@@ -27,6 +31,7 @@ async def get_system_info(jellyfin_url: str, api_key: str) -> Optional[Dict[str,
         pass
     return None
 
+
 async def refresh_library(jellyfin_url: str, api_key: str) -> bool:
     try:
         url = f"{jellyfin_url.rstrip('/')}/Library/Refresh"
@@ -36,7 +41,8 @@ async def refresh_library(jellyfin_url: str, api_key: str) -> bool:
     except Exception:
         return False
 
-async def get_item_counts(jellyfin_url: str, api_key: str) -> Optional[Dict[str, Any]]:
+
+async def get_item_counts(jellyfin_url: str, api_key: str) -> dict[str, Any] | None:
     try:
         url = f"{jellyfin_url.rstrip('/')}/Items/Counts"
         async with httpx.AsyncClient(timeout=8.0) as client:

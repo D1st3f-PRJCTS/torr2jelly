@@ -1,8 +1,7 @@
-import unittest
-import tempfile
 import os
 import sys
-import json
+import tempfile
+import unittest
 
 # Ensure project and package roots are in sys.path
 _current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,45 +13,40 @@ for p in (_epic_root, _torr2jelly_dir):
 
 try:
     from backend.strm_engine import (
-        sanitize_filename,
-        clean_media_title,
-        extract_video_files,
-        parse_episode_info,
-        sync_single_torrent,
-        sync_all_torrents,
-        remove_torrent_files,
-        find_torrent_root_folder,
-        get_media_structure,
-        create_media_folder,
-        rename_media_item,
-        move_media_files,
-        delete_media_item,
         auto_organize_seasons,
-        rename_torrent_root_folder
+        clean_media_title,
+        create_media_folder,
+        delete_media_item,
+        get_media_structure,
+        move_media_files,
+        remove_torrent_files,
+        rename_media_item,
+        rename_torrent_root_folder,
+        sanitize_filename,
+        sync_single_torrent,
     )
 except ImportError:
     from torr2jelly.backend.strm_engine import (
-        sanitize_filename,
-        clean_media_title,
-        extract_video_files,
-        parse_episode_info,
-        sync_single_torrent,
-        sync_all_torrents,
-        remove_torrent_files,
-        find_torrent_root_folder,
-        get_media_structure,
-        create_media_folder,
-        rename_media_item,
-        move_media_files,
-        delete_media_item,
         auto_organize_seasons,
-        rename_torrent_root_folder
+        clean_media_title,
+        create_media_folder,
+        delete_media_item,
+        get_media_structure,
+        move_media_files,
+        remove_torrent_files,
+        rename_media_item,
+        rename_torrent_root_folder,
+        sanitize_filename,
+        sync_single_torrent,
     )
 
-class TestSTRMEngine(unittest.TestCase):
 
+class TestSTRMEngine(unittest.TestCase):
     def test_sanitize_filename(self):
-        self.assertEqual(sanitize_filename("Movie: The Beginning / Part 1"), "Movie The Beginning Part 1")
+        self.assertEqual(
+            sanitize_filename("Movie: The Beginning / Part 1"),
+            "Movie The Beginning Part 1",
+        )
         self.assertEqual(sanitize_filename("File?*<>|name"), "Filename")
         self.assertEqual(sanitize_filename("  Extra   Spaces  "), "Extra Spaces")
         self.assertEqual(sanitize_filename('A "quote" & <tag>'), "A quote & tag")
@@ -61,28 +55,36 @@ class TestSTRMEngine(unittest.TestCase):
         cases = [
             ("Dune.Part.Two.2024.2160p.UHD.HDR10.DV.x265", "Dune Part Two"),
             ("[Toloka] Severance (Season 1) WEBRip 1080p UkrEng", "Severance"),
-            ("The.Lord.of.the.Rings.The.Fellowship.of.the.Ring.(2001).BDRip.x264", "The Lord of the Rings The Fellowship of the Ring"),
+            (
+                "The.Lord.of.the.Rings.The.Fellowship.of.the.Ring.(2001).BDRip.x264",
+                "The Lord of the Rings The Fellowship of the Ring",
+            ),
             ("Breaking Bad Сезон 1-2 1080p", "Breaking Bad"),
             ("Chernobyl (2019) 1080p BluRay", "Chernobyl"),
             ("Inception.2010.1080p.BDRip", "Inception"),
             ("2001 A Space Odyssey", "2001 A Space Odyssey"),
             ("1984", "1984"),
             ("Dark S01 720p WEB-DL", "Dark"),
-            ("[Hurtom] Stranger Things (Season 4) [2022] WEB-DL 2160p", "Stranger Things"),
+            (
+                "[Hurtom] Stranger Things (Season 4) [2022] WEB-DL 2160p",
+                "Stranger Things",
+            ),
             ("Legend (2015) BDRemux 1080p 2xUkr/Eng | Sub...", "Legend"),
         ]
         for raw, expected in cases:
             cleaned = clean_media_title(raw)
-            self.assertEqual(cleaned, expected, f"Failed for {raw}: got {cleaned}, expected {expected}")
+            self.assertEqual(
+                cleaned,
+                expected,
+                f"Failed for {raw}: got {cleaned}, expected {expected}",
+            )
 
     def test_sync_single_torrent_movie(self):
         with tempfile.TemporaryDirectory() as tmp_media:
             torrent_data = {
                 "hash": "movie123hash",
                 "title": "Inception.2010.1080p.BDRip",
-                "file_stats": [
-                    {"id": 0, "path": "Inception.2010.mkv", "size": 1000}
-                ]
+                "file_stats": [{"id": 0, "path": "Inception.2010.mkv", "size": 1000}],
             }
             stream_url = "http://torrserver:8090"
             paths = sync_single_torrent(torrent_data, tmp_media, stream_url)
@@ -96,9 +98,17 @@ class TestSTRMEngine(unittest.TestCase):
                 "hash": "series456hash",
                 "title": "Severance (Season 1)",
                 "file_stats": [
-                    {"id": 0, "path": "Severance/Season 1/Severance.S01E01.mkv", "size": 1000},
-                    {"id": 1, "path": "Severance/Season 1/Severance.S01E02.mkv", "size": 1000}
-                ]
+                    {
+                        "id": 0,
+                        "path": "Severance/Season 1/Severance.S01E01.mkv",
+                        "size": 1000,
+                    },
+                    {
+                        "id": 1,
+                        "path": "Severance/Season 1/Severance.S01E02.mkv",
+                        "size": 1000,
+                    },
+                ],
             }
             stream_url = "http://torrserver:8090"
             paths = sync_single_torrent(torrent_data, tmp_media, stream_url)
@@ -113,9 +123,7 @@ class TestSTRMEngine(unittest.TestCase):
             torrent_data = {
                 "hash": "delhash123",
                 "title": "Old Movie (2000)",
-                "file_stats": [
-                    {"id": 0, "path": "Old.Movie.2000.mkv", "size": 500}
-                ]
+                "file_stats": [{"id": 0, "path": "Old.Movie.2000.mkv", "size": 500}],
             }
             stream_url = "http://torrserver:8090"
             paths = sync_single_torrent(torrent_data, tmp_media, stream_url)
@@ -133,9 +141,7 @@ class TestSTRMEngine(unittest.TestCase):
             torrent_data = {
                 "hash": "movie123hash",
                 "title": "Old Movie Title",
-                "file_stats": [
-                    {"id": 0, "path": "Legend.mkv", "size": 1000}
-                ]
+                "file_stats": [{"id": 0, "path": "Legend.mkv", "size": 1000}],
             }
             stream_url = "http://torrserver:8090"
             paths1 = sync_single_torrent(torrent_data, tmp_media, stream_url)
@@ -208,7 +214,7 @@ class TestSTRMEngine(unittest.TestCase):
                 "MessyShow.S01E01.strm",
                 "MessyShow.S01E02.strm",
                 "MessyShow.2x01.strm",
-                "MessyShow.Special.strm"
+                "MessyShow.Special.strm",
             ]
             for lf in loose_files:
                 with open(os.path.join(show_root, lf), "w") as fl:
@@ -244,6 +250,7 @@ class TestSTRMEngine(unittest.TestCase):
             self.assertTrue(os.path.exists(new_root))
             self.assertFalse(os.path.exists(old_root))
             self.assertTrue(os.path.exists(os.path.join(new_root, "Season 01", "ep1.strm")))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
-import unittest
-import tempfile
 import os
 import sys
+import tempfile
+import unittest
 
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _torr2jelly_dir = os.path.dirname(_current_dir)
@@ -9,10 +9,10 @@ for p in (_torr2jelly_dir,):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from backend import torrent_store, strm_engine
+from backend import strm_engine, torrent_store
+
 
 class TestTorrentStore(unittest.TestCase):
-
     def setUp(self):
         self.tmp_dir = tempfile.TemporaryDirectory()
         self.db_path = os.path.join(self.tmp_dir.name, "test_users.db")
@@ -30,7 +30,7 @@ class TestTorrentStore(unittest.TestCase):
             clean_title="True Detective",
             category="show",
             poster="https://image.tmdb.org/poster.jpg",
-            folder_name="True Detective"
+            folder_name="True Detective",
         )
 
         meta = torrent_store.get_torrent_meta(h)
@@ -59,6 +59,7 @@ class TestTorrentStore(unittest.TestCase):
             self.assertIsNotNone(recovered)
             self.assertEqual(recovered[0], "Severance")
             self.assertEqual(recovered[1], "Severance")
+
 
 if __name__ == "__main__":
     unittest.main()

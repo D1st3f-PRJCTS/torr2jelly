@@ -1,7 +1,10 @@
 import os
 import tempfile
+
 import pytest
+
 from backend import auth
+
 
 def test_password_hashing():
     pw = "SecretPassword123!"
@@ -10,6 +13,7 @@ def test_password_hashing():
     assert len(salt) > 0
     assert auth.verify_password(pw, h, salt) is True
     assert auth.verify_password("WrongPassword", h, salt) is False
+
 
 def test_jwt_token_creation_and_validation():
     secret = "my-super-secret-key-for-testing"
@@ -28,11 +32,12 @@ def test_jwt_token_creation_and_validation():
     expired_token = auth.create_access_token("bob", "user", secret, expires_in_seconds=-10)
     assert auth.decode_access_token(expired_token, secret) is None
 
+
 def test_user_db_lifecycle(monkeypatch):
     with tempfile.TemporaryDirectory() as tmpdir:
         test_db = os.path.join(tmpdir, "test_users.db")
         monkeypatch.setenv("USERS_DB_PATH", test_db)
-        
+
         auth.init_db()
         assert auth.count_users() == 0
 

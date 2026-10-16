@@ -1,7 +1,8 @@
 import os
 import tempfile
-import pytest
+
 from fastapi.testclient import TestClient
+
 
 def test_api_auth_and_rbac(monkeypatch):
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -11,7 +12,8 @@ def test_api_auth_and_rbac(monkeypatch):
         monkeypatch.setenv("CONFIG_FILE_PATH", test_settings)
         monkeypatch.setenv("JWT_SECRET", "test-secret-key-12345")
 
-        from backend import auth, main, config
+        from backend import auth, main
+
         auth.init_db()
 
         client = TestClient(main.app)
@@ -26,7 +28,10 @@ def test_api_auth_and_rbac(monkeypatch):
         assert res.status_code == 401
 
         # 3. Perform setup -> create first admin
-        res = client.post("/api/auth/setup", json={"username": "superadmin", "password": "SuperPassword123"})
+        res = client.post(
+            "/api/auth/setup",
+            json={"username": "superadmin", "password": "SuperPassword123"},
+        )
         assert res.status_code == 200
         admin_data = res.json()
         assert "token" in admin_data
@@ -50,16 +55,23 @@ def test_api_auth_and_rbac(monkeypatch):
         assert "jwt_secret" not in res.json()  # jwt_secret must not leak
 
         # 7. Admin creates regular user
-        res = client.post("/api/users", headers=headers_admin, json={
-            "username": "viewer",
-            "password": "ViewerPassword123",
-            "role": "user"
-        })
+        res = client.post(
+            "/api/users",
+            headers=headers_admin,
+            json={
+                "username": "viewer",
+                "password": "ViewerPassword123",
+                "role": "user",
+            },
+        )
         assert res.status_code == 200
         assert res.json()["user"]["role"] == "user"
 
         # 8. Regular user logs in
-        res = client.post("/api/auth/login", json={"username": "viewer", "password": "ViewerPassword123"})
+        res = client.post(
+            "/api/auth/login",
+            json={"username": "viewer", "password": "ViewerPassword123"},
+        )
         assert res.status_code == 200
         viewer_token = res.json()["token"]
         headers_viewer = {"Authorization": f"Bearer {viewer_token}"}
@@ -80,16 +92,26 @@ def test_api_auth_and_rbac(monkeypatch):
         assert res.status_code == 403
 
         # 12. Regular user changes own password
-        res = client.post("/api/auth/change-password", headers=headers_viewer, json={
-            "current_password": "ViewerPassword123",
-            "new_password": "NewViewerPassword456"
-        })
+        res = client.post(
+            "/api/auth/change-password",
+            headers=headers_viewer,
+            json={
+                "current_password": "ViewerPassword123",
+                "new_password": "NewViewerPassword456",
+            },
+        )
         assert res.status_code == 200
 
         # Login with old password fails
-        res = client.post("/api/auth/login", json={"username": "viewer", "password": "ViewerPassword123"})
+        res = client.post(
+            "/api/auth/login",
+            json={"username": "viewer", "password": "ViewerPassword123"},
+        )
         assert res.status_code == 401
 
         # Login with new password succeeds
-        res = client.post("/api/auth/login", json={"username": "viewer", "password": "NewViewerPassword456"})
+        res = client.post(
+            "/api/auth/login",
+            json={"username": "viewer", "password": "NewViewerPassword456"},
+        )
         assert res.status_code == 200

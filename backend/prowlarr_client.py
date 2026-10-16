@@ -3,13 +3,12 @@ try:
 except ImportError:
     httpx = None
 
-from typing import List, Dict, Any, Optional
+from typing import Any
 
-def _get_headers(api_key: str) -> Dict[str, str]:
-    return {
-        "X-Api-Key": api_key,
-        "Accept": "application/json"
-    }
+
+def _get_headers(api_key: str) -> dict[str, str]:
+    return {"X-Api-Key": api_key, "Accept": "application/json"}
+
 
 async def check_health(prowlarr_url: str, api_key: str) -> bool:
     if not httpx:
@@ -22,7 +21,8 @@ async def check_health(prowlarr_url: str, api_key: str) -> bool:
     except Exception:
         return False
 
-def determine_release_status(indexer_flags: List[str], download_volume_factor: Optional[float]) -> str:
+
+def determine_release_status(indexer_flags: list[str], download_volume_factor: float | None) -> str:
     flags_lower = [str(f).lower() for f in indexer_flags]
     if "freeleech" in flags_lower or download_volume_factor == 0:
         return "gold"
@@ -30,22 +30,19 @@ def determine_release_status(indexer_flags: List[str], download_volume_factor: O
         return "silver"
     return "normal"
 
+
 async def search(
     prowlarr_url: str,
     api_key: str,
     query: str,
-    categories: Optional[List[int]] = None,
-    limit: int = 50
-) -> List[Dict[str, Any]]:
+    categories: list[int] | None = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
     if not query.strip() or not httpx:
         return []
 
     url = f"{prowlarr_url.rstrip('/')}/api/v1/search"
-    params: Dict[str, Any] = {
-        "query": query,
-        "type": "search",
-        "limit": limit
-    }
+    params: dict[str, Any] = {"query": query, "type": "search", "limit": limit}
     if categories:
         params["categories"] = categories
 
@@ -75,25 +72,27 @@ async def search(
         # Priority score: gold=3, silver=2, normal=1
         priority = 3 if status == "gold" else (2 if status == "silver" else 1)
 
-        results.append({
-            "guid": guid,
-            "title": item.get("title"),
-            "indexer": item.get("indexer"),
-            "indexer_id": item.get("indexerId"),
-            "size": item.get("size", 0),
-            "seeders": item.get("seeders", 0),
-            "leechers": item.get("leechers", 0),
-            "publish_date": item.get("publishDate"),
-            "link": link,
-            "page_url": page_url or link,
-            "download_url": download_url,
-            "magnet_url": magnet_url,
-            "info_hash": item.get("infoHash"),
-            "indexer_flags": raw_flags,
-            "release_status": status,  # "gold", "silver", "normal"
-            "priority": priority,
-            "categories": [c.get("name") for c in item.get("categories", []) if isinstance(c, dict)]
-        })
+        results.append(
+            {
+                "guid": guid,
+                "title": item.get("title"),
+                "indexer": item.get("indexer"),
+                "indexer_id": item.get("indexerId"),
+                "size": item.get("size", 0),
+                "seeders": item.get("seeders", 0),
+                "leechers": item.get("leechers", 0),
+                "publish_date": item.get("publishDate"),
+                "link": link,
+                "page_url": page_url or link,
+                "download_url": download_url,
+                "magnet_url": magnet_url,
+                "info_hash": item.get("infoHash"),
+                "indexer_flags": raw_flags,
+                "release_status": status,  # "gold", "silver", "normal"
+                "priority": priority,
+                "categories": [c.get("name") for c in item.get("categories", []) if isinstance(c, dict)],
+            }
+        )
 
     # Default sorting: by PRIORITY first (Gold -> Silver -> Normal), then by seeders desc
     results.sort(key=lambda x: (x.get("priority", 0), x.get("seeders", 0)), reverse=True)
