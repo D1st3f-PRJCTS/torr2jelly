@@ -2,6 +2,19 @@
   display: none !important;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Better touch feel on touchscreens */
+button, select, input, a, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .glass {
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(12px);
@@ -11,8 +24,8 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,4 +39,21 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.9);
+}
+
+/* Mobile safe area padding */
+.safe-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.modal-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Mobile smooth tap animation */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
 }

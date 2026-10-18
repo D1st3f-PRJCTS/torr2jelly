@@ -63,36 +63,36 @@
   </div>
 
   <!-- Top Navbar -->
-  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-900/85 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Logo + Brand -->
-      <div class="flex items-center space-x-3 cursor-pointer select-none shrink-0" @click="activeTab = 'search'">
-        <img src="/static/logo.png?v=2" alt="Torr2Jelly Logo" class="w-10 h-10 rounded-xl object-contain shadow-lg shadow-brand-500/20 border border-slate-700/50">
+      <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer select-none shrink-0" @click="activeTab = 'search'; window.scrollTo({top: 0, behavior: 'smooth'})">
+        <img src="/static/logo.png?v=2" alt="Torr2Jelly Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-contain shadow-lg shadow-brand-500/20 border border-slate-700/50">
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Torr2Jelly</h1>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 font-medium">v1.5</span>
+          <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <h1 class="text-base sm:text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Torr2Jelly</h1>
+            <span class="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 font-medium">v1.5</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block" x-text="t('app_subtitle')"></p>
+          <p class="text-[11px] text-slate-400 hidden sm:block" x-text="t('app_subtitle')"></p>
         </div>
       </div>
 
       <template x-if="isLoggedIn">
-        <div class="flex items-center space-x-2 sm:space-x-3">
-          <!-- Primary Navigation Tabs -->
-          <nav class="flex items-center space-x-1 bg-slate-950/70 p-1 rounded-xl border border-slate-800/80 shadow-inner">
+        <div class="flex items-center space-x-1.5 sm:space-x-3">
+          <!-- Primary Navigation Tabs (Desktop only) -->
+          <nav class="hidden md:flex items-center space-x-1 bg-slate-950/70 p-1 rounded-xl border border-slate-800/80 shadow-inner">
             <button @click="activeTab = 'search'"
                     :class="activeTab === 'search' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
                     class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center space-x-1.5 active:scale-95">
               <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
-              <span class="hidden md:inline" x-text="t('tab_search')"></span>
+              <span x-text="t('tab_search')"></span>
             </button>
 
             <button @click="activeTab = 'magnet'"
                     :class="activeTab === 'magnet' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
                     class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center space-x-1.5 active:scale-95">
               <i class="fa-solid fa-magnet text-[11px]"></i>
-              <span class="hidden md:inline" x-text="t('tab_magnet')"></span>
+              <span x-text="t('tab_magnet')"></span>
             </button>
 
             <template x-if="isAdmin">
@@ -100,7 +100,7 @@
                       :class="activeTab === 'settings' ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
                       class="px-3 py-1.5 rounded-lg text-xs transition-all flex items-center space-x-1.5 active:scale-95">
                 <i class="fa-solid fa-gear text-[11px]"></i>
-                <span class="hidden md:inline" x-text="t('tab_settings')"></span>
+                <span x-text="t('tab_settings')"></span>
               </button>
             </template>
           </nav>
@@ -108,46 +108,49 @@
           <!-- Single Smart Sync Button (STRM + Jellyfin refresh) -->
           <button @click="triggerSync()" :disabled="syncing"
                   :title="t('sync_btn_tooltip')"
-                  class="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 active:scale-95 transition-all text-xs font-semibold shadow-md shadow-brand-600/25 disabled:opacity-50">
+                  class="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 active:scale-95 transition-all text-xs font-semibold shadow-md shadow-brand-600/25 disabled:opacity-50 shrink-0">
             <i class="fa-solid fa-rotate text-xs" :class="syncing ? 'animate-spin' : ''"></i>
-            <span class="hidden sm:inline" x-text="syncing ? t('syncing') : t('sync_now')"></span>
+            <span class="hidden sm:inline sm:ml-2" x-text="syncing ? t('syncing') : t('sync_now')"></span>
           </button>
 
           <!-- User Menu Dropdown -->
           <div class="relative" @click.outside="userMenuOpen = false">
             <button @click="userMenuOpen = !userMenuOpen"
-                    class="flex items-center space-x-2 px-3 py-1.5 rounded-xl glass hover:bg-slate-800 transition-all text-xs border border-slate-700/80">
+                    class="flex items-center justify-center space-x-1.5 sm:space-x-2 h-9 px-2.5 sm:px-3 rounded-xl glass hover:bg-slate-800 transition-all text-xs border border-slate-700/80 shrink-0">
               <i class="fa-solid" :class="isAdmin ? 'fa-crown text-amber-400' : 'fa-user text-brand-400'"></i>
-              <span class="font-semibold text-white max-w-[90px] truncate hidden sm:inline" x-text="currentUser?.username"></span>
+              <span class="font-semibold text-white max-w-[85px] truncate hidden sm:inline" x-text="currentUser?.username"></span>
               <span class="text-[10px] px-1.5 py-0.2 rounded font-bold hidden sm:inline"
                     :class="isAdmin ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-400'"
                     x-text="isAdmin ? t('role_admin') : t('role_user')"></span>
               <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform" :class="userMenuOpen ? 'rotate-180' : ''"></i>
             </button>
 
-            <!-- Dropdown Menu -->
+            <!-- Dropdown Menu (Guaranteed to fit viewport) -->
             <div x-show="userMenuOpen"
-                 class="absolute right-0 mt-2 w-52 rounded-xl glass bg-slate-900 border border-slate-700/80 shadow-2xl py-1.5 z-50 text-xs divide-y divide-slate-800">
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 class="absolute right-0 mt-2 w-48 sm:w-52 rounded-xl glass bg-slate-900 border border-slate-700/80 shadow-2xl py-1.5 z-50 text-xs divide-y divide-slate-800 max-w-[calc(100vw-1.5rem)]">
               <div class="px-3 py-2 text-[11px] text-slate-400">
-                <span x-text="t('logged_in_as')"></span>: <span class="font-bold text-white" x-text="currentUser?.username"></span>
+                <span x-text="t('logged_in_as')"></span>: <span class="font-bold text-white truncate inline-block max-w-[120px] align-bottom" x-text="currentUser?.username"></span>
               </div>
               <div class="py-1">
                 <template x-if="isAdmin">
                   <button @click="activeTab = 'settings'; userMenuOpen = false"
-                          class="w-full text-left px-3 py-2 hover:bg-slate-800 flex items-center space-x-2 text-slate-200">
+                          class="w-full text-left px-3 py-2.5 hover:bg-slate-800 active:bg-slate-700 flex items-center space-x-2 text-slate-200">
                     <i class="fa-solid fa-gear text-brand-400 w-4"></i>
                     <span x-text="t('tab_settings')"></span>
                   </button>
                 </template>
                 <button @click="openChangePasswordModal()"
-                        class="w-full text-left px-3 py-2 hover:bg-slate-800 flex items-center space-x-2 text-slate-200">
+                        class="w-full text-left px-3 py-2.5 hover:bg-slate-800 active:bg-slate-700 flex items-center space-x-2 text-slate-200">
                   <i class="fa-solid fa-key text-cyan-400 w-4"></i>
                   <span x-text="t('change_password')"></span>
                 </button>
               </div>
               <div class="py-1">
                 <button @click="logout()"
-                        class="w-full text-left px-3 py-2 hover:bg-rose-500/10 hover:text-rose-400 flex items-center space-x-2 text-slate-300 transition-colors">
+                        class="w-full text-left px-3 py-2.5 hover:bg-rose-500/10 active:bg-rose-500/20 hover:text-rose-400 flex items-center space-x-2 text-slate-300 transition-colors">
                   <i class="fa-solid fa-arrow-right-from-bracket w-4 text-rose-400"></i>
                   <span x-text="t('logout')"></span>
                 </button>
@@ -159,7 +162,48 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" x-show="isLoggedIn">
+  <!-- ==================== MOBILE BOTTOM NAVIGATION BAR ==================== -->
+  <template x-if="isLoggedIn">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800/90 px-3 py-1.5 flex items-center justify-around shadow-2xl safe-bottom">
+      <!-- Search Tab -->
+      <button type="button" @click="activeTab = 'search'; window.scrollTo({top: 0, behavior: 'smooth'})"
+              class="flex-1 py-1 px-1 rounded-xl flex flex-col items-center justify-center transition-all min-h-[44px] active:scale-95"
+              :class="activeTab === 'search' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'">
+        <i class="fa-solid fa-magnifying-glass text-base"></i>
+        <span class="text-[10px] mt-0.5" x-text="t('tab_search_short') || 'Пошук'"></span>
+      </button>
+
+      <!-- Magnet Tab -->
+      <button type="button" @click="activeTab = 'magnet'; window.scrollTo({top: 0, behavior: 'smooth'})"
+              class="flex-1 py-1 px-1 rounded-xl flex flex-col items-center justify-center transition-all min-h-[44px] active:scale-95"
+              :class="activeTab === 'magnet' ? 'text-brand-400 font-bold' : 'text-slate-400 hover:text-slate-200'">
+        <i class="fa-solid fa-magnet text-base"></i>
+        <span class="text-[10px] mt-0.5" x-text="t('tab_magnet_short') || 'Магнет'"></span>
+      </button>
+
+      <!-- Active Torrents Shortcut Tab -->
+      <button type="button" @click="scrollToTorrents()"
+              class="flex-1 py-1 px-1 rounded-xl flex flex-col items-center justify-center transition-all min-h-[44px] text-slate-400 hover:text-cyan-400 active:scale-95">
+        <div class="relative">
+          <i class="fa-solid fa-layer-group text-base text-cyan-400"></i>
+          <span class="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono text-[9px] font-bold" x-text="torrents.length"></span>
+        </div>
+        <span class="text-[10px] mt-0.5" x-text="t('tab_torrents') || 'Торренти'"></span>
+      </button>
+
+      <!-- Settings Tab (Admin only) -->
+      <template x-if="isAdmin">
+        <button type="button" @click="activeTab = 'settings'; window.scrollTo({top: 0, behavior: 'smooth'})"
+                class="flex-1 py-1 px-1 rounded-xl flex flex-col items-center justify-center transition-all min-h-[44px] active:scale-95"
+                :class="activeTab === 'settings' ? 'text-indigo-400 font-bold' : 'text-slate-400 hover:text-slate-200'">
+          <i class="fa-solid fa-gear text-base"></i>
+          <span class="text-[10px] mt-0.5" x-text="t('tab_settings_short') || 'Налаштування'"></span>
+        </button>
+      </template>
+    </nav>
+  </template>
+
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8 pb-24 md:pb-8" x-show="isLoggedIn">
 
     <!-- TAB 1: Search Media by Title -->
     <div x-show="activeTab === 'search'" class="space-y-6">
@@ -194,9 +238,9 @@
         </form>
 
         <!-- Filters & Sorting bar -->
-        <div class="flex flex-wrap items-center justify-between gap-4 mt-4 pt-3 border-t border-slate-800 text-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-800 text-xs">
           <!-- Status Filter -->
-          <div class="flex items-center space-x-4 text-slate-400">
+          <div class="flex items-center space-x-3 text-slate-400">
             <template x-if="status.only_gold_torrents && !isAdmin">
               <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[11px] flex items-center space-x-1.5">
                 <i class="fa-solid fa-crown text-amber-400 text-[10px]"></i>
@@ -204,46 +248,50 @@
               </span>
             </template>
             <template x-if="!status.only_gold_torrents || isAdmin">
-              <div class="flex items-center space-x-4">
-                <span class="font-medium text-slate-300" x-text="t('filter_label')"></span>
-                <button @click="filterStatus = 'all'"
-                        :class="filterStatus === 'all' ? 'text-white font-bold underline' : 'hover:text-slate-200'"
+              <div class="flex items-center space-x-2">
+                <span class="font-medium text-slate-400 text-[11px]" x-text="t('filter_label')"></span>
+                <button type="button" @click="filterStatus = 'all'"
+                        class="px-2.5 py-1 rounded-lg border text-xs transition-all"
+                        :class="filterStatus === 'all' ? 'bg-slate-800 border-slate-600 text-white font-bold' : 'border-slate-800 hover:bg-slate-800/60 text-slate-400'"
                         x-text="t('filter_all')">
                 </button>
-                <button @click="filterStatus = 'gold'"
-                        :class="filterStatus === 'gold' ? 'text-amber-400 font-bold underline' : 'hover:text-amber-300'"
-                        class="flex items-center space-x-1">
+                <button type="button" @click="filterStatus = 'gold'"
+                        class="px-2.5 py-1 rounded-lg border text-xs transition-all flex items-center space-x-1.5"
+                        :class="filterStatus === 'gold' ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold' : 'border-slate-800 hover:bg-slate-800/60 text-amber-400/80'">
                   <span x-text="t('filter_gold')"></span>
-                  <span class="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 text-[10px]" x-text="goldCount"></span>
+                  <span class="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold" x-text="goldCount"></span>
                 </button>
               </div>
             </template>
           </div>
 
-          <!-- Category Default Dropdown -->
-          <div class="flex items-center space-x-2">
-            <span class="text-slate-400 font-medium" x-text="t('search_category_label')"></span>
-            <select x-model="searchDefaultCategory"
-                    class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer">
-              <option value="auto" x-text="t('type_auto')"></option>
-              <template x-for="cat in availableCategories" :key="cat.id">
-                <option :value="cat.id" x-text="cat.name || cat.id"></option>
-              </template>
-            </select>
-          </div>
+          <!-- Dropdowns in responsive grid -->
+          <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            <!-- Category Default Dropdown -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:space-x-1.5">
+              <span class="text-slate-400 font-medium text-[11px] hidden sm:inline" x-text="t('search_category_label')"></span>
+              <select x-model="searchDefaultCategory"
+                      class="w-full sm:w-auto bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm">
+                <option value="auto" x-text="t('type_auto')"></option>
+                <template x-for="cat in availableCategories" :key="cat.id">
+                  <option :value="cat.id" x-text="cat.name || cat.id"></option>
+                </template>
+              </select>
+            </div>
 
-          <!-- Sorting Dropdown -->
-          <div class="flex items-center space-x-2">
-            <span class="text-slate-400 font-medium" x-text="t('sort_label')"></span>
-            <select x-model="sortBy"
-                    class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer">
-              <option value="priority" x-text="t('sort_priority')"></option>
-              <option value="seeders_desc" x-text="t('sort_seeders_desc')"></option>
-              <option value="size_desc" x-text="t('sort_size_desc')"></option>
-              <option value="size_asc" x-text="t('sort_size_asc')"></option>
-              <option value="date_desc" x-text="t('sort_date_desc')"></option>
-              <option value="title_asc" x-text="t('sort_title_asc')"></option>
-            </select>
+            <!-- Sorting Dropdown -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:space-x-1.5">
+              <span class="text-slate-400 font-medium text-[11px] hidden sm:inline" x-text="t('sort_label')"></span>
+              <select x-model="sortBy"
+                      class="w-full sm:w-auto bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm">
+                <option value="priority" x-text="t('sort_priority')"></option>
+                <option value="seeders_desc" x-text="t('sort_seeders_desc')"></option>
+                <option value="size_desc" x-text="t('sort_size_desc')"></option>
+                <option value="size_asc" x-text="t('sort_size_asc')"></option>
+                <option value="date_desc" x-text="t('sort_date_desc')"></option>
+                <option value="title_asc" x-text="t('sort_title_asc')"></option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -306,10 +354,10 @@
                   </p>
                 </div>
 
-                <div class="flex items-center space-x-2.5 shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 mt-2 sm:mt-0 shrink-0 w-full sm:w-auto">
                   <select x-model="r.category"
                           :title="t('category_label')"
-                          class="bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-2.5 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm">
+                          class="w-full sm:w-auto bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm min-h-[38px]">
                     <option value="auto" x-text="t('type_auto')"></option>
                     <template x-for="cat in availableCategories" :key="cat.id">
                       <option :value="cat.id" x-text="cat.name || cat.id" :selected="r.category === cat.id"></option>
@@ -317,7 +365,7 @@
                   </select>
                   <button @click="addFromSearch(r)" :disabled="addingGuid === r.guid"
                           :class="r.release_status === 'gold' ? 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-bold shadow-amber-500/25' : 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-600/30'"
-                          class="px-4 py-2 rounded-xl text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center space-x-1.5 disabled:opacity-50">
+                          class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50 min-h-[38px]">
                     <i class="fa-solid fa-play text-[10px]" :class="addingGuid === r.guid ? 'animate-spin' : ''"></i>
                     <span x-text="addingGuid === r.guid ? t('adding_to_library') : t('add_to_library')"></span>
                   </button>
@@ -888,7 +936,7 @@
     </template>
 
     <!-- Torrents List / Dashboard -->
-    <div class="space-y-4 pt-4 border-t border-slate-800/80">
+    <div id="torrents-section" class="space-y-4 pt-4 border-t border-slate-800/80 scroll-mt-20">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 class="text-lg font-bold flex items-center space-x-2">
@@ -945,11 +993,11 @@
             <!-- Torrents Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <template x-for="t in group.items" :key="t.hash">
-          <div class="glass rounded-2xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg hover:shadow-brand-500/5 group relative overflow-hidden">
+          <div class="glass rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg hover:shadow-brand-500/5 group relative overflow-hidden min-w-0">
             <div>
-              <div class="flex gap-3.5">
+              <div class="flex gap-3 sm:gap-3.5">
                 <!-- Poster Thumbnail Preview -->
-                <div class="relative w-20 sm:w-24 h-28 sm:h-32 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden shrink-0 flex items-center justify-center group/poster cursor-pointer shadow-md"
+                <div class="relative w-20 sm:w-24 h-28 sm:h-32 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden shrink-0 flex items-center justify-center group/poster cursor-pointer shadow-md select-none"
                      @click="openPosterModal(t)"
                      :title="t('change_poster')">
                   <template x-if="t.poster">
@@ -963,8 +1011,8 @@
                       <span class="text-[9px] font-medium leading-tight" x-text="t('no_poster')"></span>
                     </div>
                   </template>
-                  <!-- Overlay on hover to edit poster -->
-                  <div class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/poster:opacity-100 flex flex-col items-center justify-center transition-opacity text-white text-[10px] space-y-1">
+                  <!-- Overlay on hover or active to edit poster -->
+                  <div class="absolute inset-0 bg-slate-950/70 opacity-0 group-hover/poster:opacity-100 flex flex-col items-center justify-center transition-opacity text-white text-[10px] space-y-1 pointer-events-none">
                     <i class="fa-solid fa-image text-cyan-400 text-sm"></i>
                     <span x-text="t('change_poster')"></span>
                   </div>
@@ -975,32 +1023,35 @@
                   <div class="space-y-1">
                     <div class="flex items-center justify-between gap-1">
                       <div class="flex items-center space-x-1.5 min-w-0">
-                        <div class="relative inline-flex items-center group/cat shrink-0" :title="t('change_category')">
+                        <div class="relative inline-flex items-center shrink-0" :title="t('change_category')">
                           <select :value="t.category"
+                                  @click.stop
                                   @change="changeTorrentCategory(t, $event.target.value)"
-                                  class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full cursor-pointer appearance-none pr-4 focus:outline-none transition-all shadow-sm"
+                                  class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full cursor-pointer appearance-none pr-5 focus:outline-none transition-all shadow-sm"
                                   :class="getCategoryBadgeClass(t.category)">
                             <template x-for="cat in availableCategories" :key="cat.id">
                               <option :value="cat.id" x-text="cat.name || cat.id" :selected="t.category === cat.id" class="bg-slate-900 text-white font-normal"></option>
                             </template>
                           </select>
-                          <i class="fa-solid fa-chevron-down absolute right-1.5 top-1.5 text-[7px] pointer-events-none opacity-60 group-hover/cat:opacity-100 transition-opacity"></i>
+                          <i class="fa-solid fa-chevron-down absolute right-1.5 top-1/2 -translate-y-1/2 text-[7px] pointer-events-none opacity-70"></i>
                         </div>
                         <span class="text-xs text-slate-400 font-mono truncate" x-text="formatBytes(t.torrent_size)"></span>
                       </div>
+
+                      <!-- Action buttons with generous touch targets (min 36x36px) -->
                       <div class="flex items-center space-x-1 shrink-0">
-                        <button @click.stop="openRenameModal(t)" :title="t('rename_torrent')"
-                                class="text-slate-400 hover:text-cyan-300 p-1 rounded-lg hover:bg-slate-800 transition-all shrink-0">
+                        <button type="button" @click.stop="openRenameModal(t)" :title="t('rename_torrent')"
+                                class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-800/80 hover:bg-slate-700 active:bg-cyan-600 active:text-white text-slate-400 hover:text-cyan-300 border border-slate-700/60 transition-all shrink-0">
                           <i class="fa-solid fa-pen-to-square text-xs"></i>
                         </button>
-                        <button @click="deleteTorrent(t.hash, t.clean_title)" :title="t('delete_user_btn')"
-                                class="text-slate-500 hover:text-rose-400 p-1 rounded-lg hover:bg-rose-500/10 transition-all shrink-0">
+                        <button type="button" @click.stop="deleteTorrent(t.hash, t.clean_title)" :title="t('delete_user_btn')"
+                                class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-800/80 hover:bg-rose-500/20 active:bg-rose-600 active:text-white text-slate-500 hover:text-rose-400 border border-slate-700/60 transition-all shrink-0">
                           <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                       </div>
                     </div>
 
-                    <h3 class="font-bold text-sm text-white line-clamp-1 group-hover:text-brand-300 transition-colors cursor-pointer"
+                    <h3 class="font-bold text-sm text-white line-clamp-1 group-hover:text-brand-300 transition-colors cursor-pointer pt-0.5"
                         @click="openFileManager(t)"
                         :title="t.clean_title" x-text="t.clean_title"></h3>
                     <p class="text-[11px] text-slate-400 line-clamp-1" :title="t.title" x-text="t.title"></p>
@@ -1008,13 +1059,13 @@
 
                   <!-- Quick Action Buttons -->
                   <div class="flex items-center space-x-2 pt-2">
-                    <button @click="openFileManager(t)"
-                            class="flex-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-brand-600 text-slate-200 hover:text-white border border-slate-700/80 hover:border-brand-500 transition-all text-xs font-semibold flex items-center justify-center space-x-1.5 shadow-sm active:scale-95">
+                    <button type="button" @click="openFileManager(t)"
+                            class="flex-1 px-3 py-2 rounded-xl bg-slate-800 hover:bg-brand-600 active:bg-brand-700 text-slate-200 hover:text-white border border-slate-700/80 hover:border-brand-500 transition-all text-xs font-semibold flex items-center justify-center space-x-1.5 shadow-sm active:scale-95 min-h-[36px]">
                       <i class="fa-solid fa-folder-tree text-brand-400 group-hover:text-white"></i>
                       <span x-text="t('files_structure')"></span>
                     </button>
-                    <button @click="openPosterModal(t)"
-                            class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-all text-xs font-semibold flex items-center justify-center space-x-1 active:scale-95"
+                    <button type="button" @click="openPosterModal(t)"
+                            class="w-10 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-300 hover:text-white border border-slate-700/80 transition-all text-xs font-semibold flex items-center justify-center space-x-1 active:scale-95 shrink-0"
                             :title="t('change_poster')">
                       <i class="fa-solid fa-image text-cyan-400"></i>
                     </button>
@@ -1028,15 +1079,15 @@
                   <span x-text="t('video_files_label')"></span>
                   <span class="text-brand-400 font-bold font-mono" x-text="t.video_files_count"></span>
                 </div>
-                <div class="text-[11px] text-slate-400 line-clamp-1 font-mono" x-text="t.video_files.map(f => f.name).join(', ')"></div>
+                <div class="text-[11px] text-slate-400 line-clamp-1 font-mono break-all" x-text="t.video_files.map(f => f.name).join(', ')"></div>
               </div>
             </div>
 
             <!-- Live Status & Peers / Speed footer -->
-            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-1.5 text-xs">
               <!-- When torrent is ACTIVE / STREAMING / PRELOAD -->
               <template x-if="isTorrentActive(t)">
-                <div class="flex items-center justify-between w-full">
+                <div class="flex flex-wrap items-center justify-between gap-1.5 w-full">
                   <div class="flex items-center space-x-1.5 min-w-0">
                     <span class="relative flex h-2 w-2 shrink-0">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -1051,7 +1102,7 @@
                       </template>
                     </span>
                   </div>
-                  <div class="flex items-center space-x-2 text-[11px] font-mono shrink-0 pl-2">
+                  <div class="flex items-center space-x-2 text-[11px] font-mono shrink-0">
                     <span class="text-emerald-400 flex items-center space-x-1" :title="t('seeders_unit')">
                       <i class="fa-solid fa-seedling text-[10px]"></i>
                       <span class="font-bold" x-text="t.connected_seeders || 0"></span>
@@ -1174,8 +1225,8 @@
           <i class="fa-solid fa-key text-cyan-400"></i>
           <span x-text="t('change_pw_title')"></span>
         </h3>
-        <button @click="changePwModalOpen = false" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
+        <button type="button" @click="changePwModalOpen = false" class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
@@ -1222,8 +1273,8 @@
           <i class="fa-solid fa-lock text-brand-400"></i>
           <span><span x-text="t('reset_pw_title')"></span>: <span class="text-brand-300" x-text="resetPwTargetUser"></span></span>
         </h3>
-        <button @click="resetPwModalOpen = false" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
+        <button type="button" @click="resetPwModalOpen = false" class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
@@ -1270,8 +1321,8 @@
             </div>
           </div>
         </div>
-        <button @click="fileManagerModalOpen = false" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <button type="button" @click="fileManagerModalOpen = false" class="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors shrink-0">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
@@ -1392,14 +1443,14 @@
                       </div>
 
                       <!-- File Actions -->
-                      <div class="flex items-center space-x-1 shrink-0 opacity-80 group-hover/row:opacity-100 transition-opacity">
-                        <button @click="renameItem(file.path, 'file')" :title="t('rename_item')"
-                                class="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition-colors">
-                          <i class="fa-solid fa-pencil text-[11px]"></i>
+                      <div class="flex items-center space-x-1 shrink-0">
+                        <button type="button" @click="renameItem(file.path, 'file')" :title="t('rename_item')"
+                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 transition-colors">
+                          <i class="fa-solid fa-pencil text-xs"></i>
                         </button>
-                        <button @click="deleteItem(file.path)" :title="t('delete_item')"
-                                class="p-1.5 rounded hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-colors">
-                          <i class="fa-solid fa-trash-can text-[11px]"></i>
+                        <button type="button" @click="deleteItem(file.path)" :title="t('delete_item')"
+                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-colors">
+                          <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                       </div>
                     </div>
@@ -1423,8 +1474,8 @@
           <i class="fa-solid fa-image text-cyan-400"></i>
           <span x-text="t('poster_modal_title')"></span>
         </h3>
-        <button @click="posterModalOpen = false" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark"></i>
+        <button type="button" @click="posterModalOpen = false" class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
@@ -1483,8 +1534,8 @@
           <i class="fa-solid fa-pen-to-square text-cyan-400"></i>
           <span x-text="t('rename_torrent_title')"></span>
         </h3>
-        <button @click="renameModalOpen = false" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <button type="button" @click="renameModalOpen = false" class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 

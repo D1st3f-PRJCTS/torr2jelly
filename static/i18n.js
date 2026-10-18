@@ -18,8 +18,12 @@ window.I18N = {
 
     // Tabs
     tab_search: "Пошук за назвою",
+    tab_search_short: "Пошук",
     tab_magnet: "Додати за посиланням",
+    tab_magnet_short: "Магнет",
+    tab_torrents: "Торренти",
     tab_settings: "Налаштування",
+    tab_settings_short: "Налаштування",
 
     // Tab 1: Search
     search_heading: "Пошук фільмів та серіалів на трекерах",
@@ -256,8 +260,12 @@ window.I18N = {
 
     // Tabs
     tab_search: "Search by Title",
+    tab_search_short: "Search",
     tab_magnet: "Add by Link",
+    tab_magnet_short: "Magnet",
+    tab_torrents: "Torrents",
     tab_settings: "Settings",
+    tab_settings_short: "Settings",
 
     // Tab 1: Search
     search_heading: "Search Movies & TV Shows across Trackers",

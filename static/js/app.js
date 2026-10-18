@@ -687,6 +687,13 @@
           }
         },
 
+        scrollToTorrents() {
+          const el = document.getElementById("torrents-section");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+        },
+
         get filteredTorrents() {
           if (!this.searchQuery) return this.torrents;
           const q = this.searchQuery.toLowerCase();
