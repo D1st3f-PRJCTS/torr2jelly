@@ -162,7 +162,7 @@
         addingUser: false,
 
         // Application state
-        activeTab: 'search',
+        activeTab: 'torrents',
         status: {},
         torrents: [],
         searchResults: [],
@@ -429,7 +429,7 @@
             await this.loadUsersList();
           } else {
             if (this.activeTab === 'settings') {
-              this.activeTab = 'search';
+              this.activeTab = 'torrents';
             }
           }
         },
@@ -723,10 +723,8 @@
         },
 
         scrollToTorrents() {
-          const el = document.getElementById("torrents-section");
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth" });
-          }
+          this.activeTab = "torrents";
+          window.scrollTo({ top: 0, behavior: "smooth" });
         },
 
         get filteredTorrents() {
@@ -902,6 +900,7 @@
               this.searchQueryTitle = '';
               this.searchResults = [];
               await this.loadTorrents();
+              this.activeTab = 'torrents';
             } else {
               const err = await res.json();
               this.notify(err.detail || 'Error adding torrent', 'error');
@@ -959,6 +958,7 @@
               this.form.title = '';
               await this.loadTorrents();
               this.notify(this.t('torrent_added_success', { title: 'Media' }), 'success');
+              this.activeTab = 'torrents';
             } else {
               const err = await res.json();
               this.notify(err.detail || 'Error adding torrent', 'error');
