@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/D1st3f-PRJCTS/torr2jelly/actions/workflows/docker-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/D1st3f-PRJCTS/torr2jelly/docker-publish.yml?branch=main&label=Build%20%26%20Publish&style=flat-square" alt="Build Status" /></a>
   <a href="https://github.com/D1st3f-PRJCTS/torr2jelly/pkgs/container/torr2jelly"><img src="https://img.shields.io/badge/Container-GHCR-blue?style=flat-square&logo=docker" alt="Docker Container" /></a>
+  <img src="https://img.shields.io/badge/Version-v1.5.0-orange?style=flat-square" alt="Version 1.5.0" />
   <img src="https://img.shields.io/badge/Python-3.11+-brightgreen?style=flat-square&logo=python" alt="Python Version" />
   <img src="https://img.shields.io/badge/FastAPI-0.115+-009688?style=flat-square&logo=fastapi" alt="FastAPI" />
   <img src="https://img.shields.io/badge/License-MIT-purple?style=flat-square" alt="License" />
@@ -23,16 +24,16 @@
 **Torr2Jelly** is a modern, lightweight bridge connecting **Prowlarr**, **TorrServer**, and **Jellyfin**. It allows users to search trackers, add torrents with one click, automatically generate `.strm` links, organize media hierarchies, and start streaming high-bitrate movies and shows directly on Jellyfin within seconds.
 
 <p align="center">
-  <img src="static/screenshot.png" alt="Torr2Jelly Web Interface" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+  <img src="static/screenshot.png" alt="Torr2Jelly Web Interface" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);" />
 </p>
 
 ```mermaid
 flowchart LR
-    User([👤 User / Browser]) <--> WebUI[💻 Torr2Jelly Web UI]
+    User([👤 User / Mobile / PC]) <--> WebUI[💻 Torr2Jelly Web UI]
     WebUI <--> Backend[⚡ FastAPI Backend]
     Backend <-->|Search & Trackers| Prowlarr[(📡 Prowlarr)]
     Backend <-->|Streams & Swarm Stats| TorrServer[(⚡ TorrServer)]
-    Backend -->|Generate .strm & Refresh| MediaDir[📁 Media Folder]
+    Backend -->|Generate .strm & Category Routing| MediaDir[📁 Media Libraries]
     MediaDir --> Jellyfin[(🍿 Jellyfin Server)]
     Jellyfin <-->|Live Stream| TorrServer
 ```
@@ -41,20 +42,24 @@ flowchart LR
 
 ## ✨ Key Features
 
-- 🔍 **Unified Prowlarr Search**: Instant tracker search with automatic seeders/peers sorting and category matching.
+- 🔍 **Unified Prowlarr Search**: Instant tracker search with automatic seeders/peers sorting, category filters, and live tracker badges.
 - 🥇 **Freeleech & Gold Torrent Filtering**: Built-in toggle to restrict regular users to gold/freeleech torrents while admins retain full access.
-- ⚡ **Instant Streaming via TorrServer**: No waiting hours for multi-gigabyte downloads. Playback starts immediately as TorrServer caches the stream on disk or RAM.
+- ⚡ **Instant Streaming via TorrServer**: No waiting hours for multi-gigabyte downloads. Playback starts immediately as TorrServer buffers sequential video chunks.
 - 🍿 **Automated `.strm` Generation**: Intelligently detects movies vs. multi-episode series and writes clean, standardized `.strm` files into target Jellyfin libraries.
+- 📁 **Multi-Category Custom Storage Paths**: Route content to dedicated folders (e.g. `/media/movies`, `/media/shows`, `/media/anime`, `/media/cartoons`) with automatic directory discovery.
+- 📱 **Mobile-First Responsive Interface**: Clean dark glassmorphic design featuring isolated tab navigation (Dashboard, Torrents, Search, Magnet, Settings) and a fixed bottom thumb dock for smartphones.
+- 🖼️ **Cinemeta & TMDB Poster Integration**: Automatic artwork matching with interactive visual poster picker modal.
 - 📊 **Realtime Swarm & Speed Dashboard**: Live seeder/leecher counters, peer connection monitors, and realtime download/upload throughput gauges for active streams.
-- 🗂️ **Smart Season Auto-Organizer**: 1-click organizer that analyzes episode file naming conventions (`S01E02`, `1x05`, etc.) and arranges them into standard season directories.
-- 👥 **Multi-User RBAC & Security**: Role-based access control (Admin / Regular User), salted SHA-256 passwords, JWT bearer tokens, and user management modal.
-- 🌐 **Modern Glassmorphic UI**: Beautiful dark interface with Ukrainian and English language localization.
+- 🗂️ **Interactive File Manager & Season Auto-Organizer**: Built-in directory browser with 1-click organizer that parses episode naming conventions (`S01E02`, `1x05`, etc.) into structured season folders.
+- 🗑️ **Safe Torrent & Media Cleanup**: Confirmation modal with the choice to either retain or permanently delete generated `.strm` files when removing torrents.
+- 👥 **Multi-User RBAC & Security**: Role-based access control (Admin / Regular User), salted SHA-256 passwords, JWT bearer tokens, and user management.
+- 🌐 **Bilingual Localization**: Seamlessly switch between English and Ukrainian with a single click.
 
 ---
 
 ## ⚡ Quickstart with Docker Compose
 
-Running Torr2Jelly is as simple as adding this short service to your `docker-compose.yml`:
+Running Torr2Jelly is as simple as adding this service to your `docker-compose.yml`:
 
 ```yaml
 services:
@@ -133,6 +138,6 @@ ruff format backend tests
 
 ---
 
-## 📜 License
+## 📄 License
 
 Distributed under the **MIT License**. See `LICENSE` for more information.

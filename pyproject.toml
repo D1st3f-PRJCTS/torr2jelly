@@ -1,6 +1,6 @@
 [project]
 name = "torr2jelly"
-version = "1.0.0"
+version = "1.5.0"
 description = "Lightweight Torrent-to-Jellyfin streaming bridge powered by TorrServer"
 readme = "README.md"
 requires-python = ">=3.10"
