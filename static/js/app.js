@@ -23,7 +23,7 @@
         // Auth state
         token: localStorage.getItem('torr2jelly_token') || '',
         currentUser: null,
-        isLoggedIn: false,
+        isLoggedIn: !!(localStorage.getItem('torr2jelly_token')),
         authModalOpen: false,
         authMode: 'login', // 'login' or 'setup'
         authForm: { username: '', password: '', confirmPassword: '' },
@@ -111,6 +111,41 @@
             this.notify('Error: ' + e, 'error');
           } finally {
             this.renamingLoading = false;
+          }
+        },
+
+        // Delete Torrent Modal state
+        deleteTorrentModalOpen: false,
+        torrentToDelete: null,
+        deleteTorrentStrm: true,
+        deletingTorrent: false,
+
+        openDeleteTorrentModal(torrent) {
+          if (!torrent) return;
+          this.torrentToDelete = torrent;
+          this.deleteTorrentStrm = true;
+          this.deleteTorrentModalOpen = true;
+        },
+
+        async confirmDeleteTorrent() {
+          if (!this.torrentToDelete) return;
+          this.deletingTorrent = true;
+          try {
+            const hash = this.torrentToDelete.hash;
+            const title = this.torrentToDelete.clean_title || this.torrentToDelete.title || "";
+            const res = await this.apiFetch(`/api/torrents/${hash}?delete_strm=${this.deleteTorrentStrm}`, { method: "DELETE" });
+            if (res.ok) {
+              this.deleteTorrentModalOpen = false;
+              this.notify(this.t("torrent_deleted_success", { title }), "success");
+              await this.loadTorrents();
+            } else {
+              const err = await res.json().catch(() => ({}));
+              this.notify(err.detail || "Error deleting torrent", "error");
+            }
+          } catch (e) {
+            this.notify("Error: " + e, "error");
+          } finally {
+            this.deletingTorrent = false;
           }
         },
 
@@ -936,17 +971,8 @@
         },
 
         async deleteTorrent(hash, title) {
-          if (!confirm(this.t('confirm_delete_torrent', { title: title }))) return;
-          try {
-            const res = await this.apiFetch(`/api/torrents/${hash}?delete_strm=true`, { method: 'DELETE' });
-            if (res.ok) {
-              await this.loadTorrents();
-            } else {
-              this.notify('Error deleting torrent', 'error');
-            }
-          } catch (e) {
-            this.notify('Error: ' + e, 'error');
-          }
+          const t = this.torrents.find(x => x.hash === hash) || { hash, clean_title: title, title };
+          this.openDeleteTorrentModal(t);
         },
 
         async triggerSync() {
